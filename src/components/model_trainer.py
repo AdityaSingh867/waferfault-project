@@ -13,32 +13,13 @@ from src.utils import save_object , load_object , evaluate_model
 
 class ModelTrainerConfig:
     Trained_model_file_path = os.path.join("artifacts" , "model.pkl")
-
-
-
-class CustomModel:
-    def __init__(self , preprocessing_object , trained_model_object):
-        self.preprocessing_object = preprocessing_object
-
-        self.trained_model_object = trained_model_object
-
-        def predict(self , X):
-            transformed_feature = self.preprocessing_object.transform(X)
-
-            return self.trained_model_object.predict(transformed_feature)
-        
-        def __repr__(self):
-            return f"{type(self.trained_model_object).__name__}()"
-        
-        def __str__(self):
-            return f"{type(self.trained_model_object).__name__}()"
         
 
 class ModelTrainer:
     def __init__(self):
         self.mode_trainer_config = ModelTrainerConfig()
 
-    def initiate_model_trainer(self , train_array , test_array , preprocessor_path):
+    def initiate_model_trainer(self , train_array , test_array):
         try:
             logging.info(f"Splitting training and testing input and target feature")
 
@@ -71,33 +52,15 @@ class ModelTrainer:
             ]
 
             best_model = models[best_model_name]
-
-            if best_model_score < 0.6:
-                raise Exception("No best model found")
             
-            logging.info(f"Best found model on both training and testing dataset")
-
-            preprocessing_obj = load_object(file_path=preprocessor_path)
-
-            custom_model = CustomModel(
-                preprocessing_object=preprocessing_obj,
-                trained_model_object=best_model
-            )
-
+            logging.info(f"Best found model on both training and testing dataset")            
             logging.info(f"saving model at path : {self.mode_trainer_config.Trained_model_file_path}")
 
             save_object(
                 file_path=self.mode_trainer_config.Trained_model_file_path,
-                obj=custom_model
+                obj=best_model
             )
 
-            predicted = best_model.predict(X_test)
-
-            r_2_score = r2_score(y_test , predicted)
-
-            ######### Upload file code likhna hain yaha per####################
-            ###################################################################
-            return r_2_score
         
         except Exception as e:
             logging.info("Exception occured in initiate_model_trainer")
